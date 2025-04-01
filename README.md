@@ -1,3 +1,18 @@
+<p align="center">
+<img src="https://github.com/Rau-N/DomainSentinel/raw/main/.assets/domain_sentinel_logo.png" 
+alt="Domain_Sentinel_Logo" title="Domain_Sentinel_Logo" />
+</p>
+
+---
+
+<h1 align="center">
+<img alt="GitHub" src="https://img.shields.io/github/license/Rau-N/DomainSentinel?color=blue">
+<img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/Rau-N/DomainSentinel?include_prereleases">
+<img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/Rau-N/DomainSentinel">
+<img alt="GitHub issues" src="https://img.shields.io/github/issues/Rau-N/DomainSentinel">
+<img alt="GitHub last commit (branch)" src="https://img.shields.io/github/last-commit/Rau-N/DomainSentinel/main">
+</h1>
+
 # Domain Sentinel
 
 ## Overview
@@ -172,75 +187,25 @@ http:
 
 ---
 
-## Setup instructions (Local Testing)
+## Setup instructions
 
-Step 1: **Create the Plugin**
+Step 1: **Load/import the plugin into traefik**
 
-1. Create a directory for the plugin inside the `plugins-local` folder, such as `traefik/plugins-local/src/DomainSentinel/`. The name of the plugin directory must match the name from the import statement of the `.traefik.yml` manifest file, in this case it's `DomainSentinel`.
-
-2. Place the plugin’s Go source code files in this directory:
-
-    - main.go (contains the plugin logic).
-    - .traefik.yml (meta file for loading the plugin)
-    - Other necessary Go files (if any).
-
-    Here's an example structure:
-
-    ```bash
-    traefik/
-    ├── plugins-local/
-    │   └── src/
-    │       └── DomainSentinel/
-    │           ├── .traefik.yml
-    │           ├── go.mod
-    │           └── main.go
-    ```
-
-Step 2: **Configure Traefik for Local Plugins**
-
-1. Edit your Traefik static configuration file (e.g., traefik.yml or traefik.toml), and enable experimental local plugins:
+1. Edit your Traefik static configuration file (e.g., traefik.yml or traefik.toml), and add the plugin's Github repository:
 
     Example: `traefik.yml`:
     ```yaml
     experimental:
-      localPlugins:
+      plugins:
         domainSentinel:
-          moduleName: DomainSentinel
+          moduleName: "github.com/Rau-N/DomainSentinel"
+          version: "v1.0.0"
     ```
+    **Ensure to use the current version tag.**
 
-2. Edit your Traefik `docker-compose.yml` file and create a bind-mount for the `plugins-local` directory in order to make it available for the traefik container.
+Step 2: **Configure Dynamic Configuration**
 
-    Example: `docker-compose.yml`:
-    ```yaml
-    services:
-      edgerouter:
-        image: traefik:2.11
-        container_name: traefik
-        security_opt:
-          - no-new-privileges:true
-        ports:
-          - 80:80
-          - 443:443
-          - 11111:11111
-        restart: "always"
-        volumes:
-          - /etc/localtime:/etc/localtime:ro
-          - /var/run/docker.sock:/var/run/docker.sock:ro
-          - ./config:/etc/traefik
-          - ./plugins-local:/plugins-local
-          - ./letsencrypt:/letsencrypt
-          - /certs:/certs
-        networks:
-          - edgerouter
-
-    networks:
-      edgerouter:
-        external: true
-    ```
-
-Step 3: **Configure Dynamic Configuration**
-
-1. Create a dynamic configuration file (e.g., dynamic.yml) that defines how the plugin should behave:
+1. Create a new or use an already existing dynamic configuration file (e.g., dynamic.yml) that defines how the plugin should behave:
 
     Example `dynamic.yml`:
     ```yaml
@@ -274,7 +239,7 @@ Step 3: **Configure Dynamic Configuration**
 
     - This configuration defines the global rules for the `domain-sentinel` middleware, consisting of any combination of domain names, requested paths, and source IP addresses.
 
-Step 4: **Associate the middleware plugin to the entrypoint**
+Step 3: **Associate the middleware plugin to the entrypoint**
 
 1. Edit your Traefik static configuration file `traefik.yml`:
 
@@ -289,9 +254,9 @@ Step 4: **Associate the middleware plugin to the entrypoint**
             - domain-sentinel@file
     ```
 
-    - This configuration ensures that the `domain-sentinel` can analyze and intervene in the whole network traffic passing through the traefik proxy.
+    - This configuration ensures that the `domain-sentinel` middleware can analyze and intervene in the whole network traffic passing through the traefik proxy.
 
-Step 5: **Restart Traefik**
+Step 4: **Restart Traefik**
 
 1. Start or restart traefik to load the plugin and apply the new configuration
 

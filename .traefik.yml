@@ -1,0 +1,33 @@
+# The name of the plugin as displayed in the Plugins Catalog web UI.
+displayName: Domain Sentinel
+
+# For now, `middleware` is the only type available.
+type: middleware
+
+# The import path of the plugin.
+import: DomainSentinel
+
+# A brief description of what the plugin is doing.
+summary: DomainSentinel is a middleware plugin that enables centralized, domain-aware IP filtering. It allows you to define trusted source IPs or CIDR blocks for entire domains or specific URL paths. When a request is received, the plugin verifies that the client's IP is explicitly allowed for the target domain and path. Only approved requests are forwarded to the next middleware in the chain; all others will be rejected.
+ 
+# Configuration data for the plugin.
+# This is mandatory,
+# and Plugins Catalog will try to execute the plugin with the data provided as part of its startup validity tests.
+testData:
+  domainPathRules:
+    "www3.example.com":
+      sourceIPs:
+        - "192.168.1.0/24"
+        - "78.6.34.123"
+        - "10.10.3.111"
+    "www4.example.com":
+      sourceIPs:
+        - "0.0.0.0/0"
+      pathRules:
+        - path: "/admin/*"
+          sourceIPs:
+            - "10.10.4.0/24"
+            - "192.168.1.2"
+        - path: "/oai/*"
+          sourceIPs:
+            - "76.5.98.123"
