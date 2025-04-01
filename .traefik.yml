@@ -5,7 +5,7 @@ displayName: Domain Sentinel
 type: middleware
 
 # The import path of the plugin.
-import: DomainSentinel
+import: github.com/Rau-N/DomainSentinel
 
 # A brief description of what the plugin is doing.
 summary: DomainSentinel is a middleware plugin that enables centralized, domain-aware IP filtering. It allows you to define trusted source IPs or CIDR blocks for entire domains or specific URL paths. When a request is received, the plugin verifies that the client's IP is explicitly allowed for the target domain and path. Only approved requests are forwarded to the next middleware in the chain; all others will be rejected.
