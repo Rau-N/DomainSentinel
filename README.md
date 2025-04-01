@@ -21,7 +21,7 @@ The `domainSentinel` plugin is a Traefik middleware designed to **centrally mana
 
 It provides fine-grained control by allowing both **domain-wide** and **path-specific** whitelisting using individual IP addresses and CIDR blocks. This is especially useful for protecting administrative interfaces, staging environments, internal APIs, or other sensitive routes, ensuring only trusted sources can reach them.
 
-![Domain Sentinel diagram](.assets/domain_sentinel_diagram.excalidraw.svg)
+![Domain Sentinel diagram](https://raw.githubusercontent.com/Rau-N/DomainSentinel/main/.assets/domain_sentinel_diagram.png)
 
 ## Structs and Configuration Explanation
 
