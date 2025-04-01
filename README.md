@@ -6,7 +6,7 @@ alt="Domain_Sentinel_Logo" title="Domain_Sentinel_Logo" />
 ---
 
 <h1 align="center">
-<img alt="GitHub" src="https://img.shields.io/github/license/Rau-N/DomainSentinel?color=blue">
+<img alt="GitHub" src="https://img.shields.io/github/license/Rau-N/DomainSentinel?color=blue&">
 <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/Rau-N/DomainSentinel?include_prereleases">
 <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/Rau-N/DomainSentinel">
 <img alt="GitHub issues" src="https://img.shields.io/github/issues/Rau-N/DomainSentinel">
