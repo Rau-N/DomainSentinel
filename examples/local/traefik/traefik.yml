@@ -1,0 +1,27 @@
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      middlewares:
+        - domain-sentinel@file
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+experimental:
+  localPlugins:
+    domainSentinel:
+      moduleName: github.com/Rau-N/DomainSentinel  # represents the folder in plugins-local/src
+
+log:
+  level: DEBUG
