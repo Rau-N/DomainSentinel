@@ -10,19 +10,21 @@ import (
 
 // Config holds the plugin configuration.
 type Config struct {
-	DomainPathRules map[string]DomainConfig `json:"domainPathRules,omitempty"`
+	DomainPathRules map[string]DomainConfig `json:"domainPathRules" yaml:"domainPathRules" mapstructure:"domainPathRules"`
 }
 
 // DomainConfig holds domain-wide source IPs and path-specific configurations.
 type DomainConfig struct {
-	SourceIPs []string     `json:"sourceIPs,omitempty"` // Domain-wide source IPs
-	PathRules []PathConfig `json:"pathRules,omitempty"` // Path-specific rules
+	SourceIPs []string      `json:"sourceIPs"   yaml:"sourceIPs"   mapstructure:"sourceIPs"`
+	PathRules []PathConfig  `json:"pathRules"   yaml:"pathRules"   mapstructure:"pathRules"`
+	Deny      *DenyResponse `json:"denyResponse" yaml:"denyResponse" mapstructure:"denyResponse"`
 }
 
 // PathConfig holds the path and source IPs for a specific path under a domain.
 type PathConfig struct {
-	Path      string   `json:"path,omitempty"`
-	SourceIPs []string `json:"sourceIPs,omitempty"`
+	Path      string        `json:"path"        yaml:"path"        mapstructure:"path"`
+	SourceIPs []string      `json:"sourceIPs"   yaml:"sourceIPs"   mapstructure:"sourceIPs"`
+	Deny      *DenyResponse `json:"denyResponse" yaml:"denyResponse" mapstructure:"denyResponse"`
 }
 
 // CreateConfig creates the default plugin configuration.
@@ -50,6 +52,10 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 
 func (ds *DomainSentinel) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println("Plugin: DomainSentinel")
+
+	clientIP := getClientIP(req)
+	fmt.Println("Client IP:", clientIP)
+
 	host := req.Host
 	var requestedDomain string
 
@@ -84,7 +90,12 @@ func (ds *DomainSentinel) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			fmt.Println("Path matches")
 			fmt.Println("SourceIPs: ", pathRule.SourceIPs)
 			if !ds.isIPAllowed(req, pathRule.SourceIPs) {
-				http.Error(rw, "DS: Forbidden", http.StatusForbidden)
+				writeDeny(rw, pathRule.Deny, domainConfig.Deny, denyData{
+					ClientIP:    clientIP,
+					Host:        requestedDomain,
+					Path:        req.URL.Path,
+					MatchedRule: pathRule.Path,
+				})
 				return
 			}
 			ds.next.ServeHTTP(rw, req)
@@ -94,7 +105,12 @@ func (ds *DomainSentinel) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	// If no path-specific rules matched, check the domain-wide rules
 	if !ds.isIPAllowed(req, domainConfig.SourceIPs) {
-		http.Error(rw, "DS: Forbidden", http.StatusForbidden)
+		writeDeny(rw, nil, domainConfig.Deny, denyData{
+			ClientIP:    clientIP,
+			Host:        requestedDomain,
+			Path:        req.URL.Path,
+			MatchedRule: "",
+		})
 		return
 	}
 
@@ -115,9 +131,10 @@ func isPathAllowed(reqPath string, pathPattern string) bool {
 }
 
 func (ds *DomainSentinel) isIPAllowed(req *http.Request, allowedIPs []string) bool {
-	ip, _, err := net.SplitHostPort(req.RemoteAddr)
-	if err != nil {
-		fmt.Println("Error splitting host and port: ", err)
+
+	clientIP := getClientIP(req)
+	if clientIP == "" {
+		fmt.Println("Client IP unknown -> deny")
 		return false
 	}
 
@@ -130,14 +147,14 @@ func (ds *DomainSentinel) isIPAllowed(req *http.Request, allowedIPs []string) bo
 	for _, cidr := range cleanedAllowedIPsArray {
 		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
-			if cidr == ip {
-				fmt.Println("Direct IP match found:", ip)
+			if cidr == clientIP {
+				fmt.Println("Direct IP match found:", clientIP)
 				return true
 			}
 			continue
 		}
 
-		if ipNet.Contains(net.ParseIP(ip)) {
+		if ipNet.Contains(net.ParseIP(clientIP)) {
 			fmt.Println("IP match found in CIDR:", cidr)
 			return true
 		}
