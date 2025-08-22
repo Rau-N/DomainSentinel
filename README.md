@@ -15,6 +15,31 @@ alt="Domain_Sentinel_Logo" title="Domain_Sentinel_Logo" />
 
 # Domain Sentinel
 
+<!-- TOC -->
+- [Overview](#overview)
+- Docs
+  - [Custom Deny Responses](docs/custom-deny-responses.md)
+- [Structs and Configuration Explanation](#structs-and-configuration-explanation)
+  - [1. Config Struct](#1-config-struct)
+  - [2. DomainConfig Struct](#2-domainconfig-struct)
+  - [3. PathConfig Struct](#3-pathconfig-struct)
+- [How it Works](#how-it-works)
+  - [Middleware Flow](#middleware-flow)
+  - [IP Matching](#ip-matching)
+  - [Path Matching](#path-matching)
+- [Example Configuration](#example-configuration)
+  - [Explanation](#explanation)
+- [Code Highlights](#code-highlights)
+  - [ServeHTTP (Core Logic)](#servehttp-core-logic)
+  - [isPathAllowed](#ispathallowed)
+  - [isIPAllowed](#isipallowed)
+- [Setup instructions](#setup-instructions)
+  - [Step 1: Load/import the plugin into traefik](#step-1-loadimport-the-plugin-into-traefik)
+  - [Step 2: Configure Dynamic Configuration](#step-2-configure-dynamic-configuration)
+  - [Step 3: Associate the middleware plugin to the entrypoint](#step-3-associate-the-middleware-plugin-to-the-entrypoint)
+  - [Step 4: Restart Traefik](#step-4-restart-traefik)
+<!-- /TOC -->
+
 ## Overview
 
 The `domainSentinel` plugin is a Traefik middleware designed to **centrally manage access control based on source IP addresses**, organized by domain and URL path. Instead of configuring access lists individually on routers, this plugin allows you to define and enforce those rules **in one central location within Traefik**.
