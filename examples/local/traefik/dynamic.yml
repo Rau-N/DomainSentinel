@@ -6,15 +6,26 @@ http:
           domainPathRules:
             "demo.localhost":
               sourceIPs:
-                - "0.0.0.0/0"
+                # - "0.0.0.0/0"
               pathRules:
                 - path: "/admin/*"
                   sourceIPs:
                     - "10.10.4.0/24"
                     - "192.168.1.2"
+                    # - "172.16.0.0/16"
+                  denyResponse:
+                    statusCode: 302
+                    headers:
+                      Location: "/login?next=[[ .Path | urlquery ]]"
+                    body: "Redirecting to login…"
                 - path: "/oai/*"
                   sourceIPs:
                     - "76.5.98.123"
+              denyResponse:
+                statusCode: 403
+                headers:
+                  resource: "[[.Path]]"
+                body: "<!doctype html><html><h1>No access for [[.ClientIP]]!</h1></html>"
             "www5.example.com":
               sourceIPs:
                 - "10.10.3.0/24"
