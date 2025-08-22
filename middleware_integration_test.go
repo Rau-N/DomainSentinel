@@ -26,6 +26,7 @@
 package DomainSentinel
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -64,7 +65,10 @@ func TestServeHTTP_PathDeny_TakesPrecedence(t *testing.T) {
 			},
 		},
 	}
-	ds, _ := New(nil, okNext(), cfg, "test")
+	ds, err := New(context.Background(), okNext(), cfg, "test")
+	if err != nil {
+		t.Fatalf("New() returned error: %v", err)
+	}
 
 	req := httptest.NewRequest("GET", "http://demo.localhost/admin/panel?tab=2", nil)
 	req.RemoteAddr = "192.168.1.50:12345" // simulate client source IP
@@ -104,7 +108,10 @@ func TestServeHTTP_DomainDeny_WhenNoPathMatch(t *testing.T) {
 			},
 		},
 	}
-	ds, _ := New(nil, okNext(), cfg, "test")
+	ds, err := New(context.Background(), okNext(), cfg, "test")
+	if err != nil {
+		t.Fatalf("New() returned error: %v", err)
+	}
 
 	req := httptest.NewRequest("GET", "http://demo.localhost/other", nil)
 	req.RemoteAddr = "192.168.1.50:12345" // simulate client source IP
@@ -140,7 +147,10 @@ func TestServeHTTP_Allowed_PassesToNext(t *testing.T) {
 			},
 		},
 	}
-	ds, _ := New(nil, okNext(), cfg, "test")
+	ds, err := New(context.Background(), okNext(), cfg, "test")
+	if err != nil {
+		t.Fatalf("New() returned error: %v", err)
+	}
 
 	req := httptest.NewRequest("GET", "http://demo.localhost/admin", nil)
 	req.RemoteAddr = "192.168.1.50:12345" // simulate client source IP

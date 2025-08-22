@@ -1,3 +1,3 @@
 module github.com/Rau-N/DomainSentinel
 
-go 1.22
+go 1.24
