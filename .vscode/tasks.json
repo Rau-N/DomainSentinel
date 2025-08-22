@@ -5,7 +5,7 @@
     { "label": "compose down", "type": "shell", "command": "docker compose -f examples/local/compose.yml down" },
     { "label": "compose restart traefik", "type": "shell", "command": "docker compose -f examples/local/compose.yml restart traefik" },
     { "label": "compose traefik logs", "type": "shell", "command": "docker compose -f examples/local/compose.yml logs -f traefik" },
-    { "label": "go test", "type": "shell", "command": "go test ./...", "group": "test" },
+    { "label": "go test", "type": "shell", "command": "go test -v ./...", "group": "test" },
     { "label": "test request", "type": "shell", "command": "curl -i -H 'Host: demo.localhost' http://localhost:8080/" }
   ]
 }

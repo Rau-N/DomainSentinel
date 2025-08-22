@@ -20,7 +20,9 @@ type DenyResponse struct {
 type denyData struct {
 	ClientIP    string
 	Host        string
-	Path        string
+	Path        string // e.g. /admin/panel
+	RawQuery    string // e.g. tab=2
+	RequestURI  string // e.g. /admin/panel?tab=2
 	MatchedRule string
 }
 

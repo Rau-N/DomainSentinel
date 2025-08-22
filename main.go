@@ -94,6 +94,8 @@ func (ds *DomainSentinel) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 					ClientIP:    clientIP,
 					Host:        requestedDomain,
 					Path:        req.URL.Path,
+					RawQuery:    req.URL.RawQuery,
+					RequestURI:  req.URL.RequestURI(),
 					MatchedRule: pathRule.Path,
 				})
 				return
@@ -109,6 +111,8 @@ func (ds *DomainSentinel) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			ClientIP:    clientIP,
 			Host:        requestedDomain,
 			Path:        req.URL.Path,
+			RawQuery:    req.URL.RawQuery,
+			RequestURI:  req.URL.RequestURI(),
 			MatchedRule: "",
 		})
 		return
